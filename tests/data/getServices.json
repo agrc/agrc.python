@@ -1,0 +1,30 @@
+{
+  "folderName": "/",
+  "description": "Root folder",
+  "webEncrypted": false,
+  "isDefault": false,
+  "folders": [
+    "System",
+    "Utilities"
+  ],
+  "services": [
+    {
+      "folderName": "/",
+      "serviceName": "DNRLands",
+      "type": "MapServer",
+      "description": ""
+    },
+    {
+      "folderName": "/",
+      "serviceName": "OilGasMining",
+      "type": "MapServer",
+      "description": ""
+    },
+    {
+      "folderName": "/",
+      "serviceName": "Hava",
+      "type": "MapServer",
+      "description": ""
+    }
+  ]
+}
