@@ -34,10 +34,10 @@ class NormalizedAddress:
     suffixDirection = None
     normalizedAddressString = None
     originalAddressString = None
-    
+
     def __init__(self, original):
         self.originalAddressString = original.strip()
-        
+
     def getPreviousWord(self, word):
         words = self.originalAddressString.upper().split(' ')
         return words[words.index(word.upper()) - 1]
@@ -66,7 +66,7 @@ def checkWord(word, d):
             return key
     # if nothing is found
     return False
-    
+
 
 def parseWord(word, state, add):
     def appendStreetWord(appendWord):
@@ -127,16 +127,22 @@ def parse(address):
     state = searchStates['houseNumber']
     for word in address.strip().split(' '):
         state = parseWord(word.upper(), state, nAdd)
-    if nAdd.suffixType is None: 
+
+    # Build normalized address string
+    if nAdd.suffixType is not None:
+        suffixDirOrType = nAdd.suffixType
+    elif nAdd.suffixDirection is not None:
         suffixDirOrType = nAdd.suffixDirection
     else:
-        suffixDirOrType = nAdd.suffixType
+        suffixDirOrType = ''
     nAdd.normalizedAddressString = nAdd.houseNumber
     if nAdd.prefixDirection is None:
         nAdd.normalizedAddressString += " {0} {1}".format(nAdd.streetName, suffixDirOrType)
     else:
         nAdd.normalizedAddressString += " {0} {1} {2}".format(
             nAdd.prefixDirection, nAdd.streetName, suffixDirOrType)
+
+    nAdd.normalizedAddressString = nAdd.normalizedAddressString.strip()
 
     return nAdd
 
