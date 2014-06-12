@@ -56,6 +56,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
                 log('updating data...')
                 arcpy.TruncateTable_management(f)
                 
+                # edit session required for data that participates in relationships
                 editSession = arcpy.da.Editor(fgdb)
                 editSession.startEditing(False, False)
                 editSession.startOperation()
