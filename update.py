@@ -65,7 +65,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
                 fields.append('SHAPE@')
                 with arcpy.da.InsertCursor(f, fields) as icursor, arcpy.da.SearchCursor(sdeFC, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as cursor:
                     for row in cursor:
-                        icursor.insertRow(row)
+                        print(str(icursor.insertRow(row)))
                 
                 editSession.stopOperation()
                 editSession.stopEditing(True)
@@ -130,7 +130,7 @@ def wasModifiedToday(fcname, fgdb):
 def filter_fields(lst):
     newFields = []
     for fld in lst:
-        if 'SHAPE' not in fld.upper() and fld.upper() not in ['GLOBAL_ID', 'GLOBALID', 'OBJECTID']:
+        if 'SHAPE' not in fld.upper() and fld.upper() not in ['GLOBAL_ID', 'GLOBALID']:
             newFields.append(fld)
     return newFields
 
@@ -160,7 +160,7 @@ def checkForChanges(f, sde):
     if fCount != sdeCount:
         return True
     
-    fields = [fld.name for fld in arcpy.ListFields(f)][1:]
+    fields = [fld.name for fld in arcpy.ListFields(f)]
     
     # filter out shape fields
     fields = filter_fields(fields)
@@ -218,7 +218,8 @@ def checkForChanges(f, sde):
                         fRow[i] = fRow[i].replace(microsecond=0)
                         sdeRow[i] = sdeRow[i].replace(microsecond=0)
                 
-                if fRow != sdeRow:
+                # compare all values except OBJECTID
+                if fRow[1:] != sdeRow[1:]:
                     changed = True
                     break
     
