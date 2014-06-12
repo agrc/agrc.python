@@ -65,7 +65,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
                 fields.append('SHAPE@')
                 with arcpy.da.InsertCursor(f, fields) as icursor, arcpy.da.SearchCursor(sdeFC, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as cursor:
                     for row in cursor:
-                        print(str(icursor.insertRow(row)))
+                        icursor.insertRow(row)
                 
                 editSession.stopOperation()
                 editSession.stopEditing(True)
