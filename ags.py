@@ -98,6 +98,9 @@ class AGSAdmin:
     def startService(self, service, type):
         return self._commandService(service, type, 'start')
     
+    def deleteService(self, service, type):
+        return self._commandService(service, type, 'delete')
+    
     def getStatus(self, service, type):
         return self._commandService(service, type, 'status')
     

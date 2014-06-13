@@ -31,7 +31,7 @@ class Emailer:
         message = MIMEText(body)
         message['Subject'] = subject
         message['From'] = self.fromAddress
-        message['To'] = toAddress
+        message['To'] = ','.join(toAddress)
 
         if not self.testing:
             s = smtplib.SMTP(self.server, self.port)
