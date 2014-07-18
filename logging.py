@@ -52,8 +52,8 @@ class Logger:
         if not os.path.exists(self.logFolder):
             os.mkdir(self.logFolder)
         
-        with open(self.logFile, mode='a') as file:
-            file.write('\n\n' + self.log)
+        with open(self.logFile, mode='a') as f:
+            f.write('\n\n' + self.log)
             
     def logError(self):
         """
@@ -63,5 +63,7 @@ class Logger:
         import traceback
         
         self.logMsg('ERROR!!!')
-        self.logMsg(traceback.format_exc())
+        errMsg = traceback.format_exc()
+        self.logMsg(errMsg)
+        return errMsg
         
