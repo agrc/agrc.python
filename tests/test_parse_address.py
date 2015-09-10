@@ -150,6 +150,7 @@ class ParseAddressTests(unittest.TestCase):
 
         result = parse_address.parse("20 W Center St")
         self.assertEqual('20', result.houseNumber)
+        self.assertEqual('W', result.prefixDirection)
         self.assertEqual("CENTER", result.streetName)
         self.assertEqual('ST', result.suffixType)
 
@@ -215,27 +216,6 @@ class ParseAddressTests(unittest.TestCase):
         self.assertEqual("N", result.streetName)
         self.assertEqual('ST', result.suffixType)
 
-        result = parse_address.parse("401 N HWY 68")
-        self.assertEqual('401', result.houseNumber)
-        self.assertEqual("HIGHWAY 68", result.streetName)
-        self.assertEqual(None, result.suffixType)
-
-        result = parse_address.parse("401 N SR 68")
-        self.assertEqual('401', result.houseNumber)
-        self.assertEqual("HIGHWAY 68", result.streetName)
-        self.assertEqual(None, result.suffixType)
-
-        result = parse_address.parse("401 N US 89")
-        self.assertEqual('401', result.houseNumber)
-        self.assertEqual("HIGHWAY 89", result.streetName)
-        self.assertEqual(None, result.suffixType)
-
-        result = parse_address.parse("401 N U.S. 89")
-
-        self.assertEqual('401', result.houseNumber)
-        self.assertEqual("HIGHWAY 89", result.streetName)
-        self.assertEqual(None, result.suffixType)
-
         result = parse_address.parse("478 S WEST FRONTAGE RD")
         self.assertEqual('478', result.houseNumber)
         self.assertEqual("WEST FRONTAGE", result.streetName)
@@ -252,6 +232,25 @@ class ParseAddressTests(unittest.TestCase):
         self.assertEqual("50", result.streetName)
         self.assertEqual(None, result.suffixType)
         self.assertEqual('W', result.suffixDirection)
+
+    def test_streetTypeNames(self):
+        result = parse_address.parse('123 E PARKWAY AVE')
+
+        self.assertEqual(result.houseNumber, '123')
+        self.assertEqual(result.prefixDirection, 'E')
+        self.assertEqual(result.streetName, 'PARKWAY')
+        self.assertEqual(result.suffixType, 'AVE')
+        self.assertEqual(result.suffixDirection, None)
+        self.assertEqual(result.normalizedAddressString, '123 E PARKWAY AVE')
+
+        result = parse_address.parse('123 E PARKWAY TRAIL AVE')
+
+        self.assertEqual(result.houseNumber, '123')
+        self.assertEqual(result.prefixDirection, 'E')
+        self.assertEqual(result.streetName, 'PARKWAY TRAIL')
+        self.assertEqual(result.suffixType, 'AVE')
+        self.assertEqual(result.suffixDirection, None)
+        self.assertEqual(result.normalizedAddressString, '123 E PARKWAY TRAIL AVE')
 
 
 class checkWordTests(unittest.TestCase):

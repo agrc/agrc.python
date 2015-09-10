@@ -38,9 +38,16 @@ class NormalizedAddress:
     def __init__(self, original):
         self.originalAddressString = original.strip()
 
+    def _getWords(self):
+        return self.originalAddressString.upper().split(' ')
+
     def getPreviousWord(self, word):
-        words = self.originalAddressString.upper().split(' ')
+        words = self._getWords()
         return words[words.index(word.upper()) - 1]
+
+    def isLastWord(self, word):
+        words = self._getWords()
+        return words.index(word.upper()) == len(words) - 1
 
 
 def __getSuffixTypes():
@@ -91,9 +98,10 @@ def parseWord(word, state, add):
             return searchStates['streetName']
     elif state == searchStates['streetName']:
         sType = checkWord(word, sTypes)
-        if not sType is False:
+        if not sType is False and add.isLastWord(word):
             appendStreetWord(add.getPreviousWord(word))
             add.prefixDirection = None
+            add.suffixType = sType
             return searchStates['end']
         appendStreetWord(word)
         return searchStates['suffixDirOrType']
