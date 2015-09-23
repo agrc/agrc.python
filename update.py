@@ -74,13 +74,10 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
                 changes.append(f.upper())
             else:
                 log('no changes found')
-
-            return passed
         except:
             errors.append('Error updating: {}'.format(f))
             if logger:
                 logger.logError()
-            return passed
 
     log('** Updating {} from {}'.format(fgdb, sde))
     errors = []
