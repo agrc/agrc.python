@@ -1,5 +1,6 @@
-*.pyc
-*.sublime-workspace
 *.project
+*.pyc
 *.pydevproject
-Logs/*.*
+agrc/Logs/*.*
+dist/
+MANIFEST
