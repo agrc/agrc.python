@@ -1,1 +1,2 @@
+v1.0.1, 11/17/2015 -- Fix tests and flake8 errors.
 v1.0.0, 11/16/2015 -- Initial release.
