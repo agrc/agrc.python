@@ -51,12 +51,11 @@ class NormalizedAddress:
 
 
 def __getSuffixTypes():
-    global reader
     types = {}
     with open(os.path.join(os.path.dirname(__file__), 'data', 'USPS_Street_Suffixes.csv'), 'rb') as file:
-        reader = reader(file)
+        rows = reader(file)
         firstrow = True
-        for row in reader:
+        for row in rows:
             if firstrow:
                 firstrow = False
                 continue
@@ -98,7 +97,7 @@ def parseWord(word, state, add):
             return searchStates['streetName']
     elif state == searchStates['streetName']:
         sType = checkWord(word, sTypes)
-        if not sType is False and add.isLastWord(word):
+        if sType is not False and add.isLastWord(word):
             appendStreetWord(add.getPreviousWord(word))
             add.prefixDirection = None
             add.suffixType = sType
@@ -111,7 +110,7 @@ def parseWord(word, state, add):
         if sType is False and sDir is False:
             appendStreetWord(word)
             return searchStates['suffixDirOrType']
-        elif not sType is False:
+        elif sType is not False:
             add.suffixType = sType
             return searchStates['end']
         else:  # sDir
@@ -119,11 +118,11 @@ def parseWord(word, state, add):
             return searchStates['end']
     elif state == searchStates['end']:
         sType = checkWord(word, sTypes)
-        if not sType is False:
+        if sType is not False:
             appendStreetWord(add.getPreviousWord(word))
             add.suffixType = sType
         sDir = checkWord(word, dirs)
-        if not sDir is False:
+        if sDir is not False:
             appendStreetWord(add.getPreviousWord(word))
             add.suffixDirection = sDir
         return searchStates['end']

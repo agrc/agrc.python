@@ -1,47 +1,49 @@
-import agrc.messaging
+from agrc import messaging
 import unittest
-from mock import Mock, patch
+from mock import patch
 
 
+@patch('agrc.messaging.SMTP')
 class sendEmailFunction(unittest.TestCase):
-    # TODO: These tests are broken trying to mock smtplib :(
     to = 'test@test.com'
     sub = 'test sub'
     body = 'test body'
 
-    def setUp(self):
-        self.emailer = agrc.messaging.Emailer(self.to)
-        with patch('smtplib.SMTP') as self.serverMock:
-            instance = self.serverMock.return_value
-            instance.sendmail = Mock()
-            instance.sendmail.return_value = ''
-        self.emailer.sendEmail(self.sub, self.body)
-    
-    def tearDown(self):
-        self.serverMock.sendmail.reset_mock()
-        self.serverMock.quit.reset_mock()
-        self.emailer = None
-    
-    def test_sendmail_fired(self):
+    def test_sendmail_fired(self, SMTP_mock):
         # sendmail should fire only when testing is False
-        assert self.serverMock.sendmail.called
-        
-        emailerTesting = agrc.messaging.Emailer(self.to, True)
-        emailerTesting.server.sendmail = Mock(name='sendmail-testing')
-        emailerTesting.sendEmail(self.sub, self.body)
-        assert not emailerTesting.server.sendmail.called
-    
-    def test_email_msg_format(self):
+        smtp_instance = SMTP_mock.return_value
+        emailer = messaging.Emailer(self.to, False)
+        emailer.sendEmail(self.sub, self.body)
+        self.assertTrue(smtp_instance.sendmail.called)
+
+        smtp_instance.reset_mock()
+        emailer.testing = True
+        emailer.sendEmail(self.sub, self.body)
+        self.assertFalse(smtp_instance.sendmail.called)
+
+    def test_email_msg_format(self, SMTP_mock):
         # should format the message correctly
-        args = self.serverMock.sendmail.call_args[0]
-        
-        assert args[0] == self.emailer.fromAddress
-        assert args[1] == self.to
-        assert args[2] == 'From: agrcpythonemailer@gmail.com\nTo: test@test.com\nSubject: test sub\n\ntest body'
-        
-    def test_quit(self):
+        emailer = messaging.Emailer(self.to, False)
+        emailer.sendEmail(self.sub, self.body)
+        args = SMTP_mock.return_value.sendmail.call_args[0]
+
+        self.assertEqual(args[0], emailer.fromAddress)
+        self.assertEqual(args[1], [self.to])
+        self.assertEqual(args[2], ('Content-Type: text/plain; charset="us-ascii"\nMIME-Version: 1.0\nContent-Transfer-Encoding: '
+                                   '7bit\nSubject: test sub\nFrom: noreply@utah.gov\nTo: test@test.com\n\ntest body'))
+
+    def test_multiple_to_addresses(self, SMTP_mock):
+        emailer = messaging.Emailer('test@test.com;test1@test.com')
+        emailer.sendEmail(self.sub, self.body)
+        args = SMTP_mock.return_value.sendmail.call_args[0]
+
+        self.assertEqual(args[1], ['test@test.com', 'test1@test.com'])
+
+    def test_quit(self, SMTP_mock):
         # should call quit on the server when it is finished
-        assert self.serverMock.quit.called
-        
+        emailer = messaging.Emailer(self.to, False)
+        emailer.sendEmail(self.sub, self.body)
+        self.assertTrue(SMTP_mock.return_value.quit.called)
+
 if __name__ == '__main__':
     unittest.main()

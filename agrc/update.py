@@ -7,6 +7,7 @@ from itertools import izip
 
 changes = []
 
+
 def updateFGDBfromSDE(fgdb, sde, logger=None):
     global changes
     """
@@ -122,8 +123,10 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
 
     return (errors, changes)
 
+
 def wasModifiedToday(fcname, fgdb):
     return fcname.upper() in changes
+
 
 def filter_fields(lst):
     newFields = []
@@ -131,6 +134,7 @@ def filter_fields(lst):
         if 'SHAPE' not in fld.upper() and fld.upper() not in ['GLOBAL_ID', 'GLOBALID']:
             newFields.append(fld)
     return newFields
+
 
 def getFieldDifferences(ds1, ds2):
     def getFields(ds):
@@ -146,6 +150,7 @@ def getFieldDifferences(ds1, ds2):
     ds2Flds = getFields(ds2)
 
     return "{} Fields: \n{}\n{} Fields: \n{}".format(ds1, ds1Flds, ds2, ds2Flds)
+
 
 def checkForChanges(f, sde):
     """
@@ -189,12 +194,13 @@ def checkForChanges(f, sde):
             return shapeValue
 
     changed = False
-    with arcpy.da.SearchCursor(f, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as fCursor, arcpy.da.SearchCursor(sde, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as sdeCursor:
+    with arcpy.da.SearchCursor(f, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as fCursor, \
+            arcpy.da.SearchCursor(sde, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as sdeCursor:
         for fRow, sdeRow in izip(fCursor, sdeCursor):
             if fRow != sdeRow:
                 # check shapes first
                 if fRow[-1] != sdeRow[-1]:
-                    if not shapeType in ['Polygon', 'Polyline', 'Point']:
+                    if shapeType not in ['Polygon', 'Polyline', 'Point']:
                         changed = True
                         break
                     fShape = parseShape(fRow[-1])

@@ -11,12 +11,12 @@ def DeleteIfExists(datasets):
 def FindFeatureClassInSDE(fcName, SDE):
     # searches through SDE to find a matching feature class
     arcpy.env.workspace = SDE
-    
+
     # look in standalone feature classes
     list = arcpy.ListFeatureClasses("*." + fcName)
     if len(list) > 0:
         return SDE + "\\" + list[0]
-    
+
     # look in datasets
     dss = arcpy.ListDatasets()
     if len(dss) > 0:

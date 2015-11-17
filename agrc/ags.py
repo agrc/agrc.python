@@ -20,7 +20,7 @@ class AGSAdmin:
     payload = None
     services = []
     noChangeMsg = "'{}'' is already set to '{}'. No changes made."
-    
+
     def __init__(self, username, password, server):
         """
         username: String
@@ -31,9 +31,9 @@ class AGSAdmin:
         self.server = server
         self.username = username
         self.password = password
-        
+
         self.getToken()
-        
+
     def getToken(self):
         data = {'username': self.username,
                 'password': self.password,
@@ -43,10 +43,10 @@ class AGSAdmin:
         r.raise_for_status()
         r = r.json()
         self.checkError(r)
-        
+
         self.token = r['token']
         self.tokenExpireDate = r['expires']
-    
+
     def getServices(self):
         def getServicesForFolder(folder):
             if folder is not None:
@@ -59,12 +59,12 @@ class AGSAdmin:
                 return responseJson['folders']
             except:
                 pass
-        
+
         for folder in getServicesForFolder(None):
             getServicesForFolder(folder)
-        
+
         return self.services
-    
+
     def editService(self, service, type, property, value):
         url = '{}/{}.{}'.format(servicesUrl.format(self.server),
                                 service,
@@ -73,12 +73,12 @@ class AGSAdmin:
 
         if property not in serviceJson.keys():
             raise Exception('Property: {} not found!'.format(property))
-        
+
         if serviceJson[property] == value:
             return self.noChangeMsg.format(property, value)
-        
+
         serviceJson[property] = value
-        
+
         return self.request('{}/edit'.format(url), {'service': json.dumps(serviceJson)})
 
     def getServiceProperty(self, service, type, property):
@@ -91,37 +91,37 @@ class AGSAdmin:
             raise Exception('Property: {} not found!'.format(property))
 
         return serviceJson[property]
-    
+
     def stopService(self, service, type):
         return self._commandService(service, type, 'stop')
-    
+
     def startService(self, service, type):
         return self._commandService(service, type, 'start')
-    
+
     def deleteService(self, service, type):
         return self._commandService(service, type, 'delete')
-    
+
     def getStatus(self, service, type):
         return self._commandService(service, type, 'status')
-    
+
     def _commandService(self, service, type, command):
         url = '{}/{}.{}/{}'.format(servicesUrl.format(self.server),
                                    service,
                                    type,
                                    command)
         return self.request(url)
-    
+
     def request(self, url, additionalData={}):
         # check to make sure that token isn't expired
         if self.tokenExpireDate <= time()*1000:
             self.getToken()
-            
+
         data = dict(additionalData.items() + {'f': 'json', 'token': self.token}.items())
         r = requests.post(url, data=data)
         r.raise_for_status()
         self.checkError(r.json())
         return r.json()
-    
+
     def checkError(self, jsonResponse):
         if 'status' in jsonResponse.keys() and jsonResponse['status'] == 'error':
             raise Exception('; '.join(jsonResponse['messages']))

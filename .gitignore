@@ -1,6 +1,9 @@
+.coverage
+.tox/
+*.egg-info
 *.project
 *.pyc
 *.pydevproject
-agrc/Logs/*.*
+**/Logs/*.*
 dist/
 MANIFEST
