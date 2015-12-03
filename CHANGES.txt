@@ -1,3 +1,4 @@
-v1.0.2, 12/03/2015 -- Fix minor bug in messaging.
-v1.0.1, 11/17/2015 -- Fix tests and flake8 errors.
-v1.0.0, 11/16/2015 -- Initial release.
+v1.1.0, 12/03/2015 -- Update tables
+v1.0.2, 12/03/2015 -- Fix minor bug in messaging
+v1.0.1, 11/17/2015 -- Fix tests and flake8 errors
+v1.0.0, 11/16/2015 -- Initial release

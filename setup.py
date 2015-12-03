@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='agrc',
-    version='1.0.2',
+    version='1.1.0',
     author='Scott Davis',
     author_email='Scott Davis',
     packages=['agrc', 'agrc.test'],
