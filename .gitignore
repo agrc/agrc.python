@@ -4,6 +4,8 @@
 *.project
 *.pyc
 *.pydevproject
+*.lock
 **/Logs/*.*
+agrc/test/Test.gdb/
 dist/
 MANIFEST

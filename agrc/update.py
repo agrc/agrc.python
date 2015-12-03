@@ -28,12 +28,15 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
         else:
             print msg
 
-    def updateData():
+    def updateData(isTable):
         try:
             # validate that there was not a schema change
             arcpy.env.workspace = fgdb
             layer = sdeFC + '_Layer'
-            arcpy.MakeFeatureLayer_management(sdeFC, layer, '1 = 2')
+            if not isTable:
+                arcpy.MakeFeatureLayer_management(sdeFC, layer, '1 = 2')
+            else:
+                arcpy.MakeTableView_management(sdeFC, layer, '1 = 2')
 
             try:
                 arcpy.Append_management(layer, f, 'TEST')
@@ -53,7 +56,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
             arcpy.Delete_management(layer)
 
             log('checking for changes...')
-            if checkForChanges(f, sdeFC) and passed:
+            if checkForChanges(f, sdeFC, isTable) and passed:
                 log('updating data...')
                 arcpy.TruncateTable_management(f)
 
@@ -64,7 +67,8 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
 
                 fields = [fld.name for fld in arcpy.ListFields(f)]
                 fields = filter_fields(fields)
-                fields.append('SHAPE@')
+                if not isTable:
+                    fields.append('SHAPE@')
                 with arcpy.da.InsertCursor(f, fields) as icursor, arcpy.da.SearchCursor(sdeFC, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as cursor:
                     for row in cursor:
                         icursor.insertRow(row)
@@ -85,7 +89,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
 
     # loop through local feature classes
     arcpy.env.workspace = fgdb
-    fcs = arcpy.ListFeatureClasses()
+    fcs = arcpy.ListFeatureClasses() + arcpy.ListTables()
     totalFcs = len(fcs)
     i = 0
     for f in fcs:
@@ -96,7 +100,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
 
         # search for match in stand-alone feature classes
         arcpy.env.workspace = sde
-        matches = arcpy.ListFeatureClasses('*.{}'.format(f))
+        matches = arcpy.ListFeatureClasses('*.{}'.format(f)) + arcpy.ListTables('*.{}'.format(f))
         if matches is not None and len(matches) > 0:
             match = matches[0]
             sdeFC = join(sde, match)
@@ -119,7 +123,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
             log(msg)
             continue
 
-        updateData()
+        updateData(arcpy.Describe(f).datasetType == 'Table')
 
     return (errors, changes)
 
@@ -152,7 +156,7 @@ def getFieldDifferences(ds1, ds2):
     return "{} Fields: \n{}\n{} Fields: \n{}".format(ds1, ds1Flds, ds2, ds2Flds)
 
 
-def checkForChanges(f, sde):
+def checkForChanges(f, sde, isTable):
     """
     returns False if there are no changes
 
@@ -166,32 +170,33 @@ def checkForChanges(f, sde):
     fields = [fld.name for fld in arcpy.ListFields(f)]
 
     # filter out shape fields
-    fields = filter_fields(fields)
+    if not isTable:
+        fields = filter_fields(fields)
 
-    d = arcpy.Describe(f)
-    shapeType = d.shapeType
-    if shapeType == 'Polygon':
-        shapeToken = 'SHAPE@AREA'
-    elif shapeType == 'Polyline':
-        shapeToken = 'SHAPE@LENGTH'
-    elif shapeType == 'Point':
-        shapeToken = 'SHAPE@XY'
-    else:
-        shapeToken = 'SHAPE@JSON'
-    fields.append(shapeToken)
-
-    def parseShape(shapeValue):
-        if shapeValue is None:
-            return 0
-        elif shapeType in ['Polygon', 'Polyline']:
-            return shapeValue
+        d = arcpy.Describe(f)
+        shapeType = d.shapeType
+        if shapeType == 'Polygon':
+            shapeToken = 'SHAPE@AREA'
+        elif shapeType == 'Polyline':
+            shapeToken = 'SHAPE@LENGTH'
         elif shapeType == 'Point':
-            if shapeValue[0] is not None and shapeValue[1] is not None:
-                return shapeValue[0] + shapeValue[1]
-            else:
-                return 0
+            shapeToken = 'SHAPE@XY'
         else:
-            return shapeValue
+            shapeToken = 'SHAPE@JSON'
+        fields.append(shapeToken)
+
+        def parseShape(shapeValue):
+            if shapeValue is None:
+                return 0
+            elif shapeType in ['Polygon', 'Polyline']:
+                return shapeValue
+            elif shapeType == 'Point':
+                if shapeValue[0] is not None and shapeValue[1] is not None:
+                    return shapeValue[0] + shapeValue[1]
+                else:
+                    return 0
+            else:
+                return shapeValue
 
     changed = False
     with arcpy.da.SearchCursor(f, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as fCursor, \
@@ -199,7 +204,7 @@ def checkForChanges(f, sde):
         for fRow, sdeRow in izip(fCursor, sdeCursor):
             if fRow != sdeRow:
                 # check shapes first
-                if fRow[-1] != sdeRow[-1]:
+                if fRow[-1] != sdeRow[-1] and not isTable:
                     if shapeType not in ['Polygon', 'Polyline', 'Point']:
                         changed = True
                         break

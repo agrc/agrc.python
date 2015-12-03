@@ -8,4 +8,6 @@ A collection of python modules that make life easier for us at AGRC (except @ste
 `pip install agrc`
 
 ### Development
+Restore `UPDATE_TESTS.bak` as a local SDE database if needed.
+
 To run tests: `tox`
