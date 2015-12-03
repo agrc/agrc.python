@@ -29,7 +29,8 @@ class Emailer:
 
         if not toAddress:
             toAddress = self.toAddress
-        toAddress = toAddress.split(';')
+        else:
+            toAddress = toAddress.split(';')
 
         message = MIMEText(body)
         message['Subject'] = subject
