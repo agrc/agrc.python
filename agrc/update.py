@@ -123,7 +123,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
             log(msg)
             continue
 
-        updateData(arcpy.Describe(f).datasetType == 'Table')
+        updateData(arcpy.Describe(join(fgdb, f)).datasetType == 'Table')
 
     return (errors, changes)
 
