@@ -12,17 +12,22 @@ checkForChangesGDB2 = os.path.join(currentFolder, 'data', 'checkForChanges2.gdb'
 updateTestsSDE = os.path.join(currentFolder, 'data', 'UPDATE_TESTS.sde')
 
 
+def runCheckForChanges(fc1, fc2):
+    f1 = os.path.join(checkForChangesGDB, fc1)
+    f2 = os.path.join(checkForChangesGDB, fc2)
+    return update.checkForChanges(f1, f2, False)
+
+
 class UpdateTest(unittest.TestCase):
     def test_checkForChanges(self):
-        def run(fc1, fc2):
-            f1 = os.path.join(checkForChangesGDB, fc1)
-            f2 = os.path.join(checkForChangesGDB, fc2)
-            return update.checkForChanges(f1, f2, False)
 
-        self.assertFalse(run('ZipCodes', 'ZipCodes_same'))
-        self.assertTrue(run('ZipCodes', 'ZipCodes_geoMod'))
-        self.assertTrue(run('ZipCodes', 'ZipCodes_attMod'))
-        self.assertTrue(run('ZipCodes', 'ZipCodes_newFeature'))
+        self.assertFalse(runCheckForChanges('ZipCodes', 'ZipCodes_same'))
+        self.assertTrue(runCheckForChanges('ZipCodes', 'ZipCodes_geoMod'))
+        self.assertTrue(runCheckForChanges('ZipCodes', 'ZipCodes_attMod'))
+        self.assertTrue(runCheckForChanges('ZipCodes', 'ZipCodes_newFeature'))
+
+    def test_checkForChangesNullDateFields(self):
+        self.assertTrue(runCheckForChanges('NullDates', 'NullDates2'))
 
     def test_filter_shape_fields(self):
         self.assertEquals(update.filter_fields(['shape', 'test', 'Shape_length', 'Global_ID']), ['test'])

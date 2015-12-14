@@ -225,7 +225,10 @@ def checkForChanges(f, sde, isTable):
                         fRow = list(fRow)
                         sdeRow = list(sdeRow)
                         fRow[i] = fRow[i].replace(microsecond=0)
-                        sdeRow[i] = sdeRow[i].replace(microsecond=0)
+                        try:
+                            sdeRow[i] = sdeRow[i].replace(microsecond=0)
+                        except:
+                            pass
 
                 # compare all values except OBJECTID
                 if fRow[1:] != sdeRow[1:]:
