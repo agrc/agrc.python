@@ -69,7 +69,12 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
                 fields = filter_fields(fields)
                 if not isTable:
                     fields.append('SHAPE@')
-                with arcpy.da.InsertCursor(f, fields) as icursor, arcpy.da.SearchCursor(sdeFC, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as cursor:
+                    outputSR = arcpy.Describe(f).spatialReference
+                else:
+                    outputSR = None
+                with arcpy.da.InsertCursor(f, fields) as icursor, \
+                    arcpy.da.SearchCursor(sdeFC, fields, sql_clause=(None, 'ORDER BY OBJECTID'),
+                                          spatial_reference=outputSR) as cursor:
                     for row in cursor:
                         icursor.insertRow(row)
 
@@ -198,9 +203,14 @@ def checkForChanges(f, sde, isTable):
             else:
                 return shapeValue
 
+        outputSR = arcpy.Describe(f).spatialReference
+    else:
+        outputSR = None
+
     changed = False
     with arcpy.da.SearchCursor(f, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as fCursor, \
-            arcpy.da.SearchCursor(sde, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as sdeCursor:
+            arcpy.da.SearchCursor(sde, fields, sql_clause=(None, 'ORDER BY OBJECTID'),
+                                  spatial_reference=outputSR) as sdeCursor:
         for fRow, sdeRow in izip(fCursor, sdeCursor):
             if fRow != sdeRow:
                 # check shapes first
