@@ -1,8 +1,5 @@
 """
 parse_address
-
-Jan 2013
-stdavis@utah.gov
 """
 
 import os
@@ -16,10 +13,12 @@ dirs = {
     'W': ['W', 'WEST', 'WE']
 }
 
+houseNumSufList = ['1/4', '1/3', '1/2', '2/3', '3/4']
+
 # searching states
 searchStates = {
     'houseNumber': 1,
-    'prefixDirection': 2,
+    'houseNumberSuffixOrPrefixDirection': 2,
     'streetName': 3,
     'suffixDirOrType': 4,
     'end': 5
@@ -28,6 +27,7 @@ searchStates = {
 
 class NormalizedAddress:
     houseNumber = None
+    houseNumberSuffix = None
     prefixDirection = None
     streetName = None
     suffixType = None
@@ -51,11 +51,12 @@ class NormalizedAddress:
 
 
 def __getSuffixTypes():
+    global reader
     types = {}
     with open(os.path.join(os.path.dirname(__file__), 'data', 'USPS_Street_Suffixes.csv'), 'rb') as file:
-        rows = reader(file)
+        reader = reader(file)
         firstrow = True
-        for row in rows:
+        for row in reader:
             if firstrow:
                 firstrow = False
                 continue
@@ -74,6 +75,12 @@ def checkWord(word, d):
     return False
 
 
+def checkList(word, list):
+    if word in list:
+        return word
+    return False
+
+
 def parseWord(word, state, add):
     def appendStreetWord(appendWord):
         if add.streetName is None:
@@ -86,15 +93,21 @@ def parseWord(word, state, add):
         return state
     if state == searchStates['houseNumber']:
         add.houseNumber = word
-        return searchStates['prefixDirection']
-    elif state == searchStates['prefixDirection']:
+        return searchStates['houseNumberSuffixOrPrefixDirection']
+
+    elif state == searchStates['houseNumberSuffixOrPrefixDirection']:
+        houseNumSuffix = checkList(word, houseNumSufList)
         pDir = checkWord(word, dirs)
-        if pDir is False:
+        if houseNumSuffix is False and pDir is False:
             appendStreetWord(word)
             return searchStates['suffixDirOrType']
-        else:
+        elif houseNumSuffix is not False:
+            add.houseNumberSuffix = houseNumSuffix
+            return searchStates['houseNumberSuffixOrPrefixDirection']
+        elif pDir is not False:
             add.prefixDirection = pDir
             return searchStates['streetName']
+
     elif state == searchStates['streetName']:
         sType = checkWord(word, sTypes)
         if sType is not False and add.isLastWord(word):
@@ -104,6 +117,7 @@ def parseWord(word, state, add):
             return searchStates['end']
         appendStreetWord(word)
         return searchStates['suffixDirOrType']
+
     elif state == searchStates['suffixDirOrType']:
         sType = checkWord(word, sTypes)
         sDir = checkWord(word, dirs)
@@ -113,9 +127,10 @@ def parseWord(word, state, add):
         elif sType is not False:
             add.suffixType = sType
             return searchStates['end']
-        else:  # sDir
+        else:
             add.suffixDirection = sDir
             return searchStates['end']
+
     elif state == searchStates['end']:
         sType = checkWord(word, sTypes)
         if sType is not False:
