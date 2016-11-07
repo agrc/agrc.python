@@ -85,6 +85,8 @@ def parseWord(word, state, add):
     def appendStreetWord(appendWord):
         if add.streetName is None:
             add.streetName = appendWord
+            if add.streetName.startswith('0'):
+                add.streetName = add.streetName.lstrip('0')
         else:
             add.streetName += ' {0}'.format(appendWord)
 
@@ -93,6 +95,8 @@ def parseWord(word, state, add):
         return state
     if state == searchStates['houseNumber']:
         add.houseNumber = word
+        if add.houseNumber.startswith('0'):
+            add.houseNumber = add.houseNumber.lstrip('0')
         return searchStates['houseNumberSuffixOrPrefixDirection']
 
     elif state == searchStates['houseNumberSuffixOrPrefixDirection']:
