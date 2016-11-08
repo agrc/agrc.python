@@ -84,7 +84,7 @@ def checkList(word, list):
 def parseWord(word, state, add):
     def appendStreetWord(appendWord):
         if add.streetName is None:
-            add.streetName.lstrip('0') = appendWord
+            add.streetName = appendWord.lstrip('0')
         else:
             add.streetName += ' {0}'.format(appendWord)
 
@@ -92,7 +92,7 @@ def parseWord(word, state, add):
     if word.strip() == '':
         return state
     if state == searchStates['houseNumber']:
-        add.houseNumber.lstrip('0') = word
+        add.houseNumber = word.lstrip('0')
         return searchStates['houseNumberSuffixOrPrefixDirection']
 
     elif state == searchStates['houseNumberSuffixOrPrefixDirection']:

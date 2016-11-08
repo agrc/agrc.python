@@ -79,8 +79,6 @@ class ParseAddressTests(unittest.TestCase):
         self.assertEqual(result.suffixType, 'ST')
 
     def test_noPreDir(self):
-        from nose.tools import set_trace
-        set_trace()
         result = parse_address.parse('1901 Sidewinder Dr')
 
         self.assertEqual(result.houseNumber, '1901')
