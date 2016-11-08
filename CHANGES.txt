@@ -1,3 +1,4 @@
+v1.2.1, 11/08/2016 -- Strip out leading 0's from street names and house numbers. Thanks, @ZachBeck!
 v1.2.0, 08/01/2016 -- Added house number suffix to address parser. Thanks, @ZachBeck!
 v1.1.3, 05/03/2016 -- Add support for mismatching spatial references between source and destination data in update.
 v1.1.2, 12/14/2015 -- Fix bug related to null values in date fields.
