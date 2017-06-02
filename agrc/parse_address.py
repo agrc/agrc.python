@@ -68,7 +68,7 @@ def __getSuffixTypes():
 
 
 def checkWord(word, d):
-    for key, value in d.iteritems():
+    for key, value in d.items():
         if word in value:
             return key
     # if nothing is found

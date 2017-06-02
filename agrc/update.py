@@ -3,7 +3,7 @@ from os.path import join
 import arcpy
 from datetime import datetime
 from numpy.testing import assert_almost_equal
-from itertools import izip
+
 
 changes = []
 
@@ -26,7 +26,7 @@ def updateFGDBfromSDE(fgdb, sde, logger=None):
         if logger:
             logger.logMsg(msg)
         else:
-            print msg
+            print(msg)
 
     def updateData(isTable):
         try:
@@ -211,7 +211,7 @@ def checkForChanges(f, sde, isTable):
     with arcpy.da.SearchCursor(f, fields, sql_clause=(None, 'ORDER BY OBJECTID')) as fCursor, \
             arcpy.da.SearchCursor(sde, fields, sql_clause=(None, 'ORDER BY OBJECTID'),
                                   spatial_reference=outputSR) as sdeCursor:
-        for fRow, sdeRow in izip(fCursor, sdeCursor):
+        for fRow, sdeRow in zip(fCursor, sdeCursor):
             if fRow != sdeRow:
                 # check shapes first
                 if fRow[-1] != sdeRow[-1] and not isTable:

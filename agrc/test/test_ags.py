@@ -71,7 +71,7 @@ class AGSAdminTest(unittest.TestCase):
         prop = 'clusterName'
         value = 'default'
         returned = s.editService('ServiceName', 'MapServer', prop, value)
-        self.assertEquals(returned, s.noChangeMsg.format(prop, value))
+        self.assertEqual(returned, s.noChangeMsg.format(prop, value))
 
     @patch.object(requests, 'post', return_value=responseMock)
     def test_request_mixes_in_additional_data(self, mock):

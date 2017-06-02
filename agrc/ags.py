@@ -71,7 +71,7 @@ class AGSAdmin:
                                 type)
         serviceJson = self.request(url)
 
-        if property not in serviceJson.keys():
+        if property not in list(serviceJson.keys()):
             raise Exception('Property: {} not found!'.format(property))
 
         if serviceJson[property] == value:
@@ -87,7 +87,7 @@ class AGSAdmin:
                                 type)
         serviceJson = self.request(url)
 
-        if property not in serviceJson.keys():
+        if property not in list(serviceJson.keys()):
             raise Exception('Property: {} not found!'.format(property))
 
         return serviceJson[property]
@@ -116,14 +116,14 @@ class AGSAdmin:
         if self.tokenExpireDate <= time()*1000:
             self.getToken()
 
-        data = dict(additionalData.items() + {'f': 'json', 'token': self.token}.items())
+        data = dict(list(additionalData.items()) + list({'f': 'json', 'token': self.token}.items()))
         r = requests.post(url, data=data)
         r.raise_for_status()
         self.checkError(r.json())
         return r.json()
 
     def checkError(self, jsonResponse):
-        if 'status' in jsonResponse.keys() and jsonResponse['status'] == 'error':
+        if 'status' in list(jsonResponse.keys()) and jsonResponse['status'] == 'error':
             raise Exception('; '.join(jsonResponse['messages']))
 
     def startAllServices(self):
@@ -132,5 +132,5 @@ class AGSAdmin:
 
         for s in self.services:
             serv = s['folderName'] + '//' + s['serviceName']
-            print 'starting {}'.format(serv)
+            print('starting {}'.format(serv))
             self.startService(serv, s['type'])

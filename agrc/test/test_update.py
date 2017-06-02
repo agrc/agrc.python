@@ -30,7 +30,7 @@ class UpdateTest(unittest.TestCase):
         self.assertTrue(runCheckForChanges('NullDates', 'NullDates2'))
 
     def test_filter_shape_fields(self):
-        self.assertEquals(update.filter_fields(['shape', 'test', 'Shape_length', 'Global_ID']), ['test'])
+        self.assertEqual(update.filter_fields(['shape', 'test', 'Shape_length', 'Global_ID']), ['test'])
 
     def test_no_updates(self):
         testGDB = os.path.join(currentFolder, 'Test.gdb')
@@ -40,7 +40,7 @@ class UpdateTest(unittest.TestCase):
 
         changes = update.updateFGDBfromSDE(testGDB, updateTestsSDE)[1]
 
-        self.assertEquals(len(changes), 0)
+        self.assertEqual(len(changes), 0)
 
     def test_update_tables(self):
         testGDB = os.path.join(currentFolder, 'Test.gdb')
@@ -50,4 +50,4 @@ class UpdateTest(unittest.TestCase):
 
         changes = update.updateFGDBfromSDE(testGDB, updateTestsSDE)[1]
 
-        self.assertEquals(changes[0], 'PROVIDERS')
+        self.assertEqual(changes[0], 'PROVIDERS')

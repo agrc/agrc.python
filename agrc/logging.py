@@ -21,7 +21,7 @@ class Logger:
             os.mkdir(self.logFolder)
 
         self.logFile = os.path.join(self.logFolder, today + '.txt')
-        print 'Logger Initialized: ' + self.log
+        print('Logger Initialized: ' + self.log)
 
     def logMsg(self, msg, printMsg=True):
         """
@@ -30,7 +30,7 @@ class Logger:
         time = datetime.datetime.now().strftime('%I:%M %p')
         self.log = '{0}\n{1} | {2}'.format(self.log, time, msg)
         if printMsg:
-            print msg
+            print(msg)
 
         if self.addLogsToArcpyMessages:
             from arcpy import AddMessage
