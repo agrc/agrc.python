@@ -53,7 +53,7 @@ class NormalizedAddress:
 def __getSuffixTypes():
     global reader
     types = {}
-    with open(os.path.join(os.path.dirname(__file__), 'data', 'USPS_Street_Suffixes.csv'), 'rb') as file:
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'USPS_Street_Suffixes.csv'), 'r') as file:
         reader = reader(file)
         firstrow = True
         for row in reader:
